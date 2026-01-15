@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./talk_to_the_book.db
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STORAGE_PATH=./storage
+      - FAISS_INDEX_PATH=./storage/indices
+      - DEBUG=true
+    volumes:
+      - ./storage:/app/storage
+      - ./master_ingest_prompt.txt:/app/master_ingest_prompt.txt
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Optional: Postgres for production
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     - POSTGRES_DB=talk_to_the_book
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+  # Optional: Prometheus for monitoring
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+
+  # Optional: Grafana for dashboards
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+
+# volumes:
+#   postgres_data:
+#   prometheus_data:
+#   grafana_data:

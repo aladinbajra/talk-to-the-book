@@ -1,0 +1,385 @@
+{
+  "book_id": "example_book_001",
+  "book_metadata": {
+    "title": "Example Book Title",
+    "author": "Example Author",
+    "detected_language": "en",
+    "file_format": "txt",
+    "total_words": 50000,
+    "total_pages_estimate": 200,
+    "detected_genres": ["self-help", "non-fiction"],
+    "detected_publication_clues": ["copyright notice", "ISBN"],
+    "copyright_flag": "clearly_copyrighted",
+    "recommended_user_consent_text": "By uploading this book, you confirm you have the right to use it for personal Q&A purposes."
+  },
+  "ingest_summary": "This is a 2-6 sentence summary of the book's main premise and dominant themes, strictly based on the text content.",
+  "book_profile": {
+    "voice_summary": "Direct, prescriptive, short-sentence style; uses second-person frequently. Employs rhetorical questions and actionable imperatives.",
+    "recurring_themes": ["habit", "practice", "confidence", "discipline", "growth", "mindset", "action", "consistency"],
+    "key_concepts": [
+      "habit stacking",
+      "three-minute rule",
+      "micro-actions",
+      "identity-based habits",
+      "environment design",
+      "implementation intention",
+      "temptation bundling",
+      "social accountability",
+      "streak tracking",
+      "habit contract",
+      "two-minute rule",
+      "progressive overload",
+      "keystone habits",
+      "cue-routine-reward",
+      "habit loop",
+      "plateau of latent potential",
+      "atomic changes",
+      "marginal gains",
+      "systems over goals",
+      "compound interest"
+    ],
+    "chapter_index": [
+      {
+        "chapter_number": 1,
+        "chapter_title": "The Surprising Power of Atomic Habits",
+        "start_loc": "p1",
+        "word_count_est": 3200
+      },
+      {
+        "chapter_number": 2,
+        "chapter_title": "How Your Habits Shape Your Identity",
+        "start_loc": "p15",
+        "word_count_est": 2800
+      }
+    ],
+    "content_gaps": ["author biography", "political views", "detailed scientific methodology", "comparison with other authors"]
+  },
+  "chunking_plan": {
+    "recommended_chunk_size_words": 600,
+    "overlap_percent": 20,
+    "chunk_boundary_preference": "YES",
+    "special_handling_for_quotations": "Extract epigraphs and block quotes as separate chunks with metadata flag 'is_quotation: true'. Preserve attribution if present.",
+    "token_estimate_per_chunk": 150,
+    "algorithm_description": "Split text into sentences. Group sentences into chunks targeting 600 words. Prefer chapter boundaries - if chunk would cross chapter boundary, end at boundary and start new chunk. Apply 20% overlap by including last 120 words of previous chunk at start of next. Generate chunk_id as '{book_id}_ch{chapter:03d}_chunk{index:04d}'. Store start_loc and end_loc as word positions. Extract first 50 characters as excerpt_hint."
+  },
+  "retrieval_config": {
+    "recommended_embedding_model": "sentence-transformers/all-mpnet-base-v2",
+    "embedding_batch_size": 32,
+    "vector_index_type": "HNSW",
+    "index_parameters": {
+      "M": 32,
+      "ef_construction": 200,
+      "ef_search": 50
+    },
+    "top_k_retrieval_default": 6,
+    "similarity_metric": "cosine",
+    "similarity_threshold_default": 0.12,
+    "re_ranking_strategy": {
+      "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "rerank_k": 50,
+      "final_k": 6
+    },
+    "caching_policy": "Keep top-200 most frequently retrieved chunks per book in-memory cache. Cache expires after 24 hours of inactivity.",
+    "cold_start_strategy": "For newly uploaded book, precompute embeddings for all chunks in background. Use approximate nearest neighbor search during indexing phase. Warm cache with chapter summaries and canonical quotes."
+  },
+  "persona_and_voice": {
+    "voice_tokens": [
+      "you can",
+      "start small",
+      "make it easy",
+      "build systems",
+      "focus on identity"
+    ],
+    "sentence_length_target": 12,
+    "punctuation_profile": "Frequent use of em-dashes for emphasis. Colons used to introduce lists. Minimal use of semicolons.",
+    "formality_level": 3,
+    "imperative_tendency": 0.7,
+    "example_transformation_rules": [
+      "Convert passive voice to active voice where book favors active",
+      "Use second-person 'you' instead of first-person 'I' when giving advice",
+      "Prefer short, punchy sentences over long, complex ones",
+      "Use present tense for actionable advice",
+      "Include rhetorical questions to engage reader",
+      "End sentences with strong action verbs when possible"
+    ],
+    "disallowed_phrases": [
+      "it is important to note",
+      "one might argue",
+      "it should be mentioned",
+      "according to research",
+      "studies have shown"
+    ]
+  },
+  "qa_datasets": {
+    "gold": [
+      {
+        "id": "g-001",
+        "chapter": 1,
+        "loc": "p3",
+        "question": "What is the main premise of atomic habits?",
+        "answer": "Atomic habits are small, incremental changes that compound over time to produce remarkable results. The focus is on systems rather than goals, making tiny 1% improvements that accumulate.",
+        "answer_type": "summary",
+        "difficulty": "easy"
+      },
+      {
+        "id": "g-002",
+        "chapter": 1,
+        "loc": "p5",
+        "question": "How do habits compound over time?",
+        "answer": "Habits compound through the power of small, consistent actions. Just as money multiplies through compound interest, habits multiply through repeated practice. A 1% improvement daily leads to being 37 times better over a year.",
+        "answer_type": "factual",
+        "difficulty": "medium"
+      }
+    ],
+    "synthetic": [
+      {
+        "id": "s-001",
+        "chapter": 1,
+        "loc": "p2",
+        "question": "What does the author mean by 'atomic' in atomic habits?",
+        "answer": "The term 'atomic' refers to habits being small, fundamental units that are easy to overlook but powerful when combined. Like atoms building molecules, atomic habits build larger behavioral systems.",
+        "answer_type": "interpretive",
+        "difficulty": "medium",
+        "source_chunk_ids": ["example_book_001_ch001_chunk0001", "example_book_001_ch001_chunk0002"],
+        "generation_prompt": "Generate a question about the meaning of 'atomic' in the context of habits, based on the provided chunks.",
+        "confidence_source_overlap": 0.85
+      }
+    ],
+    "interpretive": [
+      {
+        "id": "i-001",
+        "question": "How does the concept of atomic habits relate to personal identity?",
+        "answer": "Atomic habits shape identity through repeated actions. Each small habit vote for the type of person you want to become. The focus shifts from outcomes to identity - you don't just want to run a marathon, you want to become a runner.",
+        "chunk_ids": ["example_book_001_ch001_chunk0003", "example_book_001_ch002_chunk0001"]
+      }
+    ]
+  },
+  "chapter_summaries": [
+    {
+      "chapter_number": 1,
+      "chapter_title": "The Surprising Power of Atomic Habits",
+      "summary": "This chapter introduces the concept of atomic habits - small, incremental changes that compound over time. The author explains how focusing on systems rather than goals leads to lasting change. Through examples and analogies, readers learn that tiny 1% improvements accumulate into remarkable results, just as compound interest multiplies wealth.",
+      "key_sentences": [
+        "Small changes can make a remarkable difference.",
+        "Habits are the compound interest of self-improvement.",
+        "Focus on systems, not goals.",
+        "You don't rise to the level of your goals, you fall to the level of your systems."
+      ],
+      "chapter_concepts": ["atomic habits", "compound interest", "systems vs goals", "marginal gains", "1% improvement"],
+      "relevant_chunk_ids": ["example_book_001_ch001_chunk0001", "example_book_001_ch001_chunk0002", "example_book_001_ch001_chunk0003"]
+    }
+  ],
+  "canonical_quotes": [
+    {
+      "chunk_id": "example_book_001_ch001_chunk0001",
+      "quote_text": "You don't rise to the level of your goals, you fall to the level of your systems.",
+      "page_loc": "p3",
+      "paraphrase": "Systems are more important than goals for achieving results."
+    },
+    {
+      "chunk_id": "example_book_001_ch001_chunk0002",
+      "quote_text": "Habits are the compound interest of self-improvement.",
+      "page_loc": "p5",
+      "paraphrase": "Small habit changes accumulate like compound interest over time."
+    }
+  ],
+  "training_spec": {
+    "fine_tune_objective": "Improve interpretive answers and voice emulation while maintaining strict source-only responses",
+    "candidate_model_bases": [
+      {
+        "model": "mistral-7b-instruct",
+        "pros": ["Open source", "Good instruction following", "Efficient inference"],
+        "cons": ["Smaller context window", "May need more training data"]
+      },
+      {
+        "model": "llama-2-7b-chat",
+        "pros": ["Strong base model", "Good for fine-tuning", "Widely supported"],
+        "cons": ["Requires careful prompt engineering", "Larger model size"]
+      }
+    ],
+    "dataset_prep_instructions": "Format as instruction-following pairs: 'Question: {question}\\n\\nContext: {retrieved_chunks}\\n\\nAnswer:' followed by answer. Use JSON format for structured outputs. Deduplicate similar questions. Balance difficulty levels.",
+    "hyperparameter_recs": {
+      "epochs": 3,
+      "learning_rate": 2e-5,
+      "batch_size": 4,
+      "weight_decay": 0.01,
+      "gradient_accumulation_steps": 8,
+      "warmup_steps": 100
+    },
+    "quantization_and_export": {
+      "method": "4-bit quantization using bitsandbytes",
+      "library": "bitsandbytes",
+      "format": "GGML or safetensors",
+      "target_size": "Reduce model size by ~75%"
+    },
+    "recommended_train_val_split": "80/20 split, stratify by difficulty level and answer_type",
+    "data_augmentation_strategies": [
+      "Paraphrase questions using back-translation",
+      "Generate variations using question templates",
+      "Synthesize new questions from chapter summaries",
+      "Create multi-turn conversation pairs"
+    ],
+    "human_in_the_loop_annotation_guidelines": "Review all synthetic QA pairs for accuracy. Flag answers that go beyond source material. Verify voice emulation quality. Check for hallucination. Rate answer quality on 1-5 scale."
+  },
+  "evaluation_spec": {
+    "test_set_size": 100,
+    "metrics": {
+      "exact_match": "Percentage of answers that exactly match gold standard",
+      "f1_score": "Token-level F1 score for answer overlap",
+      "bleu_score": "BLEU score if quoting is enabled",
+      "human_rating_instructions": "Rate answers 1-5 on: accuracy, completeness, voice fidelity, source grounding"
+    },
+    "hallucination_test_suites": [
+      "What is the author's favorite color?",
+      "Does this book discuss quantum physics?",
+      "What year was the author born?",
+      "What is the author's political affiliation?",
+      "Does the book recommend specific brands?",
+      "What is the author's email address?",
+      "Does the book discuss topics from other books?",
+      "What is the author's relationship status?",
+      "Does the book mention specific companies?",
+      "What is the author's favorite food?"
+    ],
+    "multi_turn_evaluations": [
+      {
+        "session_id": "eval-001",
+        "turns": [
+          {"user": "What are atomic habits?", "expected": "Answer explaining atomic habits concept"},
+          {"user": "How do they differ from regular habits?", "expected": "Answer building on previous context"}
+        ]
+      }
+    ],
+    "ab_test_variants": [
+      {
+        "variant": "baseline",
+        "description": "Standard retrieval + generation",
+        "success_criteria": "Baseline performance metrics"
+      },
+      {
+        "variant": "with_reranking",
+        "description": "Add cross-encoder reranking",
+        "success_criteria": "10% improvement in answer quality"
+      }
+    ]
+  },
+  "runtime_prompts": {
+    "system_prompt": "You are a helpful assistant that answers questions about a specific book. You MUST answer ONLY using information from the provided book chunks. If the answer is not in the book, respond with 'UNKNOWN_IN_BOOK'. Maintain the book's voice and writing style in your responses. Output your answer as JSON: {\"answer\": \"...\", \"confidence\": 0.0-1.0, \"source_chunk_ids\": [...], \"answer_type\": \"factual|interpretive|summary\"}",
+    "user_prompt_template": "BOOK_ID: {BOOK_ID}\nBOOK_PROFILE: {BOOK_PROFILE}\n\nRETRIEVED_CHUNKS:\n{CHUNKS}\n\nCONVERSATION_HISTORY:\n{HISTORY}\n\nUSER_QUESTION: {QUESTION}",
+    "explainability_prompt": "For your last answer, output the chunk_ids you used and provide a 1-3 word rationale for each chunk explaining why it was relevant."
+  },
+  "security_and_ip": {
+    "explicit_user_consent_text": "I confirm I have the right to upload this book for personal Q&A purposes and understand that embeddings will be stored for 180 days.",
+    "recommended_retention_policy": "Retain embeddings and chunks for 180 days unless user explicitly deletes. After 180 days, prompt user to renew or delete.",
+    "copyright_risk_flags": [
+      "Book contains clearly copyrighted material",
+      "User consent required before processing",
+      "Limit verbatim quotes to <25 words",
+      "Do not reproduce full chapters"
+    ],
+    "recommended_legal_message_flows": [
+      "Show copyright notice on upload",
+      "Require explicit consent checkbox",
+      "Display retention policy",
+      "Provide deletion option"
+    ],
+    "pii_handling_rules": "Never output personally identifiable information. If a chunk contains PII, redact it in paraphrases and mark the chunk with 'contains_pii: true' flag. Do not include PII in training datasets."
+  },
+  "dev_checklist": [
+    "1. Run chunker with recommended_chunk_size_words=600, overlap_percent=20, store chunk metadata to vector DB",
+    "2. Precompute embeddings using sentence-transformers/all-mpnet-base-v2 with batch_size=32",
+    "3. Index embeddings into HNSW vector index with M=32, ef_construction=200",
+    "4. Store chunk metadata (chunk_id, start_loc, end_loc, chapter, excerpt_hint) in separate metadata store",
+    "5. Implement retrieval pipeline: query embedding -> HNSW search -> top_k=6 -> similarity threshold filter",
+    "6. Implement reranking: cross-encoder/ms-marco-MiniLM-L-6-v2 on top 50 -> select top 6",
+    "7. Set up in-memory cache for top-200 most frequently retrieved chunks per book",
+    "8. Implement cold start strategy: background embedding computation for new books",
+    "9. Create runtime prompt templates using system_prompt and user_prompt_template from ingest output",
+    "10. Implement JSON response parser for generator output (answer, confidence, source_chunk_ids, answer_type)",
+    "11. Add UNKNOWN_IN_BOOK detection logic for queries outside book scope",
+    "12. Implement voice emulation using persona_and_voice transformation rules",
+    "13. Set up explainability endpoint using explainability_prompt",
+    "14. Implement user consent flow and retention policy enforcement",
+    "15. Add PII detection and redaction pipeline",
+    "16. Create evaluation harness using gold QA dataset",
+    "17. Implement hallucination test suite with 10 negative test cases",
+    "18. Set up monitoring dashboard: query_latency_p95/p99, success_rate, unknown_rate, feedback_rate",
+    "19. Configure autoscaling: min_size=2, max_size=10, scale_on_latency>1.5s",
+    "20. Export deliverables: chunked JSONL, embeddings npz, FAISS index, QA JSONL files, book_profile.json"
+  ],
+  "deployment_recommendations": {
+    "inference_instance_types": [
+      {
+        "type": "GPU",
+        "recommendation": "g5.xlarge (NVIDIA A10G, 24GB) for <100 concurrent users",
+        "memory": "24GB GPU memory",
+        "cost_estimate": "~$1.00/hour"
+      },
+      {
+        "type": "CPU",
+        "recommendation": "c6i.2xlarge (8 vCPU, 16GB RAM) for low-traffic or cost-optimized deployment",
+        "memory": "16GB RAM",
+        "cost_estimate": "~$0.34/hour"
+      }
+    ],
+    "autoscaling_rules": {
+      "min_size": 2,
+      "max_size": 10,
+      "scale_up_threshold": "p95 latency > 1.5s for 5 minutes",
+      "scale_down_threshold": "p95 latency < 0.5s for 15 minutes",
+      "cooldown_period": "5 minutes"
+    },
+    "cost_optimization_suggestions": [
+      "Use spot instances for non-production workloads (60-70% cost savings)",
+      "Implement request batching for embedding computation",
+      "Use 4-bit quantized models for inference (4x memory reduction)",
+      "Cache frequently accessed chunks in Redis",
+      "Use reserved instances for predictable workloads"
+    ]
+  },
+  "monitoring_and_metrics": {
+    "metrics": {
+      "query_latency_p95": "95th percentile query latency in milliseconds",
+      "query_latency_p99": "99th percentile query latency in milliseconds",
+      "success_rate": "Percentage of queries returning valid answers (not errors)",
+      "unknown_rate": "Percentage of queries returning UNKNOWN_IN_BOOK",
+      "feedback_rate": "Percentage of queries receiving user feedback (thumbs up/down)",
+      "positive_feedback_ratio": "Ratio of positive to negative feedback",
+      "rerank_failure_rate": "Percentage of reranking operations that fail",
+      "retrieval_failure_rate": "Percentage of retrieval operations that fail",
+      "cache_hit_rate": "Percentage of queries served from cache"
+    },
+    "alert_thresholds": {
+      "query_latency_p95": "Alert if > 2000ms for 10 minutes",
+      "query_latency_p99": "Alert if > 5000ms for 5 minutes",
+      "success_rate": "Alert if < 95% for 15 minutes",
+      "unknown_rate": "Alert if > 30% for 30 minutes",
+      "rerank_failure_rate": "Alert if > 5% for 10 minutes"
+    },
+    "on_call_runbook_steps": [
+      "1. Check vector database connection and health",
+      "2. Verify embedding service is responding",
+      "3. Check cache hit rates - if low, investigate cache eviction",
+      "4. Review recent error logs for patterns",
+      "5. Check system resource usage (CPU, memory, GPU)",
+      "6. Verify autoscaling is functioning correctly",
+      "7. Check for recent code deployments",
+      "8. Review query patterns for anomalies"
+    ]
+  },
+  "deliverables": [
+    "chunked JSONL file: {book_id}_chunks.jsonl",
+    "embeddings file: {book_id}_embeddings.npz",
+    "FAISS index export: {book_id}_index.faiss",
+    "FAISS metadata: {book_id}_index_metadata.json",
+    "gold QA JSONL: {book_id}_qa_gold.jsonl",
+    "synthetic QA JSONL: {book_id}_qa_synthetic.jsonl",
+    "interpretive QA JSONL: {book_id}_qa_interpretive.jsonl",
+    "book_profile.json: {book_id}_profile.json",
+    "system_prompt.txt: {book_id}_system_prompt.txt",
+    "user_prompt_template.txt: {book_id}_user_template.txt",
+    "training_manifest.csv: {book_id}_training_manifest.csv",
+    "evaluation_test_set.json: {book_id}_eval_test.json"
+  ],
+  "notes_for_human_review": "Example book - all fields populated for reference. In production, verify copyright status, check for sensitive content, validate QA pair accuracy, and review voice emulation quality."
+}

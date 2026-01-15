@@ -1,0 +1,27 @@
+# Core dependencies for Talk to the Book system
+
+# LLM APIs
+openai>=1.0.0
+anthropic>=0.18.0
+
+# Embeddings and vector search
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4  # Use faiss-gpu if GPU available
+numpy>=1.24.0
+
+# Data processing
+pandas>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Optional: For local models
+# transformers>=4.30.0
+# torch>=2.0.0
+# accelerate>=0.20.0
+# bitsandbytes>=0.41.0  # For quantization
+
+# Development
+pytest>=7.4.0
+black>=23.0.0
+mypy>=1.5.0

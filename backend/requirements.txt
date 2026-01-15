@@ -1,0 +1,52 @@
+# Backend dependencies for Talk to the Book
+
+# Web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+gunicorn>=21.2.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+psycopg2-binary>=2.9.9  # Postgres
+# sqlite3 is built-in for MVP
+
+# File processing
+pdfplumber>=0.10.0
+ebooklib>=0.18
+PyPDF2>=3.0.0
+
+# LLM APIs
+openai>=1.0.0
+anthropic>=0.18.0
+
+# Embeddings and vector search
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+numpy>=1.24.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Monitoring
+prometheus-client>=0.19.0
+sentry-sdk[fastapi]>=1.38.0
+
+# Storage
+boto3>=1.29.0  # S3-compatible
+cryptography>=41.0.0  # Encryption
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+
+# Development
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.5.0
