@@ -1,0 +1,223 @@
+﻿{
+    "tests":  {
+                  "e2e_smoke":  "unknown",
+                  "unit_pytest":  "unknown"
+              },
+    "release_branch":  "release/backend-next",
+    "generated_from":  "C:\\Users\\aladinb\\Desktop\\talk_to_the_book",
+    "artifacts":  [
+                      {
+                          "path":  "backend/Dockerfile",
+                          "sha256":  "ce1815266bdd0b02cc650a3b252c43493f75b529ca56026993bc69c355f0b31f",
+                          "bytes":  545
+                      },
+                      {
+                          "path":  "backend/pytest.ini",
+                          "sha256":  "76bfd16762adc8941411442b8bd2f234f45046fccda6f58542aeacb472ef307f",
+                          "bytes":  127
+                      },
+                      {
+                          "path":  "backend/RELEASE_NOTES.md",
+                          "sha256":  "c063807bce2e4fb561a5977a7686529bf50ee57aed8a720f8902d559a98f3966",
+                          "bytes":  557
+                      },
+                      {
+                          "path":  "backend/requirements.txt",
+                          "sha256":  "6af5b776ae14398eb046f077a377c1df599138aa50f08af382f01b35a6812141",
+                          "bytes":  949
+                      },
+                      {
+                          "path":  "backend/RUNBOOK_BACKEND.md",
+                          "sha256":  "15ff7eb4a7bafe6d3559d3c4235258d22f4006c255940b11bd9a44e6d16b3b81",
+                          "bytes":  2297
+                      },
+                      {
+                          "path":  "backend/acceptance/01_ingest_complete.py",
+                          "sha256":  "22ba90960f989229f663baf10cb07d6dfb3e0e2a795b98e6253668537a342bcd",
+                          "bytes":  951
+                      },
+                      {
+                          "path":  "backend/acceptance/02_query_end_to_end.py",
+                          "sha256":  "c6b3226a95ceac60c47e586c5a00399e86f37ab2a7b53a94595cf73825e5a5db",
+                          "bytes":  1393
+                      },
+                      {
+                          "path":  "backend/acceptance/03_unknown_behavior.py",
+                          "sha256":  "c0a7914ea4be7505759c5362e2d05635978f05a507638da3cf11d0757972aa70",
+                          "bytes":  1367
+                      },
+                      {
+                          "path":  "backend/acceptance/04_security.py",
+                          "sha256":  "1134637fd65903506717d45efdf202d43bfdbfd7707276a6b27d10e13b3f2fa8",
+                          "bytes":  1437
+                      },
+                      {
+                          "path":  "backend/acceptance/fixtures/sample_book.txt",
+                          "sha256":  "55995d6741bd428925e66e183a5e519f01158855cdac8f23562006935140841b",
+                          "bytes":  290
+                      },
+                      {
+                          "path":  "backend/app/main.py",
+                          "sha256":  "3faf00839ab9df72df78929d44594cfc140b12370fe1e8d26e14d7837e13ed33",
+                          "bytes":  2949
+                      },
+                      {
+                          "path":  "backend/app/__init__.py",
+                          "sha256":  "3a97d968071320ed60af5c20dd9184fc0b74dfff5c63a280da6ba8ff16b62e58",
+                          "bytes":  42
+                      },
+                      {
+                          "path":  "backend/app/api/books.py",
+                          "sha256":  "71268c5f41709834d28398230cdf94c87e48c5e9ab8672bed847a3a255d23467",
+                          "bytes":  1589
+                      },
+                      {
+                          "path":  "backend/app/api/delete.py",
+                          "sha256":  "c2d5ce6d79f6d474d5bc9f684ffd347ec930e5bf1770b2664bd07a19df4c0a94",
+                          "bytes":  1085
+                      },
+                      {
+                          "path":  "backend/app/api/feedback.py",
+                          "sha256":  "4434440b08b052bef1d8e81191367aee38c93ca25b60f0479baffad98a6bfcc6",
+                          "bytes":  2472
+                      },
+                      {
+                          "path":  "backend/app/api/ingest.py",
+                          "sha256":  "f09a770123667319b31325bb72e229d6fabdc7275d9f996d40a37f50cbed1321",
+                          "bytes":  2822
+                      },
+                      {
+                          "path":  "backend/app/api/query.py",
+                          "sha256":  "c25053e531f06bba67a692c5c0ffb11c5f4da67fede7ba9dc2abfc2e3a0992f0",
+                          "bytes":  3480
+                      },
+                      {
+                          "path":  "backend/app/api/upload.py",
+                          "sha256":  "e2ad2d2f7eca67dd2d06c7ca8e0d774bce3663638674c74837449326eb1b6b5e",
+                          "bytes":  3215
+                      },
+                      {
+                          "path":  "backend/app/api/__init__.py",
+                          "sha256":  "44be8c5dea42f01af55c9586fc2f9df83e6b673131512a304a3412b745da31d3",
+                          "bytes":  14
+                      },
+                      {
+                          "path":  "backend/app/core/config.py",
+                          "sha256":  "f3df783061959a09ec6d73393181ccb2d42cc43ee703fdfc89b139a8341c88af",
+                          "bytes":  3673
+                      },
+                      {
+                          "path":  "backend/app/core/logging.py",
+                          "sha256":  "e2fdc70fdb4aad39e7adfcbeba9c58c1df45def7933e614591dec8127a1f1585",
+                          "bytes":  1837
+                      },
+                      {
+                          "path":  "backend/app/core/metrics.py",
+                          "sha256":  "64b59a7b391ed849f49fcbf902261b2becb63df15d503093079812342906af14",
+                          "bytes":  1975
+                      },
+                      {
+                          "path":  "backend/app/core/response_validator.py",
+                          "sha256":  "3083f647f26d791b333c8c3a0c46bc215d0c58cc27e02009efe164a106d1687b",
+                          "bytes":  6656
+                      },
+                      {
+                          "path":  "backend/app/core/system_prompt_runtime.txt",
+                          "sha256":  "5184903be2f5f28aa10f9514be7d9fe99028f81a82876deda7bfc79601ebd871",
+                          "bytes":  1727
+                      },
+                      {
+                          "path":  "backend/app/db/database.py",
+                          "sha256":  "fa7d31dd42eb2f823161f94321bad2f3b048d836996aa461e006b60e134ab577",
+                          "bytes":  862
+                      },
+                      {
+                          "path":  "backend/app/db/models.py",
+                          "sha256":  "3664f073c4864c0dcb852457680c2cdf9fbe9ec7ca99e9510e4a839dfd5e5cd5",
+                          "bytes":  3348
+                      },
+                      {
+                          "path":  "backend/app/services/cache.py",
+                          "sha256":  "0461732a9d22139a0053c82c51a0448d26805d4df85f04d9a3ecd6671ce664aa",
+                          "bytes":  3120
+                      },
+                      {
+                          "path":  "backend/app/services/chunker.py",
+                          "sha256":  "c71ffaa38a5c4432b40544a485f472adc16a470035a7bb4c81319633c1eb28f4",
+                          "bytes":  5115
+                      },
+                      {
+                          "path":  "backend/app/services/embedding_service.py",
+                          "sha256":  "5078abbd83340216fc617d188ce75fe642185a3668efa67657ef2526986ac8ee",
+                          "bytes":  3729
+                      },
+                      {
+                          "path":  "backend/app/services/encryption.py",
+                          "sha256":  "c971c5a8dbbe100087f379e8dc4895f40a3ab308b67469c8ba35fc2a565d2741",
+                          "bytes":  1405
+                      },
+                      {
+                          "path":  "backend/app/services/ingest.py",
+                          "sha256":  "bee10f7f38cd5369477cdd10e9440e0f2019e2356ace4c7fadb7216002b403aa",
+                          "bytes":  6989
+                      },
+                      {
+                          "path":  "backend/app/services/query.py",
+                          "sha256":  "2f6cbbb2f01fe86897d281d2dbd9609ea3659cb881ce7947c95f08be459d06f7",
+                          "bytes":  12008
+                      },
+                      {
+                          "path":  "backend/app/services/storage.py",
+                          "sha256":  "d2ab77bedd21b8be4875ed84520b819f622b79aa0953cc9699461f26f4724469",
+                          "bytes":  3246
+                      },
+                      {
+                          "path":  "backend/app/services/text_processor.py",
+                          "sha256":  "c998df5af6709cc4e44295d914cf01621a655957936916ee1ff84b6ba7ae4c04",
+                          "bytes":  4376
+                      },
+                      {
+                          "path":  "backend/app/services/__init__.py",
+                          "sha256":  "b54225e7cda29e37a6369ae97c32a15ac4f9f6ba6b8934997df41371a74c5238",
+                          "bytes":  12
+                      },
+                      {
+                          "path":  "backend/scripts/e2e_smoke.sh",
+                          "sha256":  "447c19760e7fc0407fe37791cc2377d1de0675dd51bbabd08202e027b135fe6a",
+                          "bytes":  1973
+                      },
+                      {
+                          "path":  "backend/scripts/generate_manifest.ps1",
+                          "sha256":  "7e0fe6939f3a20fe0ce90d5268f6ca4357264eea52dfdf357985eb0aaf4afcf5",
+                          "bytes":  1433
+                      },
+                      {
+                          "path":  "backend/scripts/generate_manifest.py",
+                          "sha256":  "6f1bbc2c8807700ab416b5e6faafb69f7ca3fbcfe7d5735c331b64e31bd58cb1",
+                          "bytes":  1613
+                      },
+                      {
+                          "path":  "backend/scripts/load_test.sh",
+                          "sha256":  "b3b7fbb8bf12ec1f3683f7252d99364b6d29e00193955c86ea4d3cfe93652c93",
+                          "bytes":  578
+                      },
+                      {
+                          "path":  "backend/tests/test_chunker.py",
+                          "sha256":  "50249f6d201f826b01f0838476dd93022a1710703785531ec27af6fc7d08abca",
+                          "bytes":  2051
+                      },
+                      {
+                          "path":  "backend/tests/test_integration.py",
+                          "sha256":  "1364169144514cdc43064e79ce2cf4e62a2ed395c84771a999cb7de8bdbf2581",
+                          "bytes":  1403
+                      },
+                      {
+                          "path":  "backend/tests/__init__.py",
+                          "sha256":  "b70e67972cd2b93702e6c7208de2b4e7985cb2f4018fdca5fab56a5a64bd9b99",
+                          "bytes":  9
+                      }
+                  ],
+    "notes":  [
+                  "If CI ran, set MANIFEST_PYTEST_STATUS and MANIFEST_E2E_STATUS env vars before generating."
+              ]
+}

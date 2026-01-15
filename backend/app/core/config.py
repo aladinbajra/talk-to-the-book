@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     # Vector DB
     VECTOR_DB_TYPE: str = os.getenv("VECTOR_DB_TYPE", "faiss")  # faiss, qdrant, weaviate
     FAISS_INDEX_PATH: str = os.getenv("FAISS_INDEX_PATH", "./storage/indices")
+    EMBEDDINGS_PATH: str = os.getenv("EMBEDDINGS_PATH", "./storage/embeddings")
     QDRANT_URL: str = os.getenv("QDRANT_URL", "http://localhost:6333")
     QDRANT_API_KEY: str = os.getenv("QDRANT_API_KEY", "")
     
@@ -76,6 +77,15 @@ class Settings(BaseSettings):
     # Monitoring
     PROMETHEUS_ENABLED: bool = os.getenv("PROMETHEUS_ENABLED", "true").lower() == "true"
     SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
+
+    # Cache
+    REDIS_URL: str = os.getenv("REDIS_URL", "")  # e.g. redis://redis:6379/0
+    CACHE_TTL_SECONDS: int = int(os.getenv("CACHE_TTL_SECONDS", "300"))
+
+    # SLOs
+    SLO_QUERY_P95_SECONDS: float = float(os.getenv("SLO_QUERY_P95_SECONDS", "3.0"))
+    SLO_UNKNOWN_RATE_MAX: float = float(os.getenv("SLO_UNKNOWN_RATE_MAX", "0.35"))
+    SLO_SUCCESS_RATE_MIN: float = float(os.getenv("SLO_SUCCESS_RATE_MIN", "0.98"))
     
     # Security
     RETENTION_DAYS: int = int(os.getenv("RETENTION_DAYS", "180"))

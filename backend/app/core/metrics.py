@@ -54,6 +54,30 @@ generation_latency_seconds = Histogram(
     ["book_id"]
 )
 
+retrieval_candidates_gauge = Gauge(
+    "retrieval_candidates",
+    "Number of retrieval candidates after thresholding",
+    ["book_id"]
+)
+
+rerank_latency_seconds = Histogram(
+    "rerank_latency_seconds",
+    "Rerank latency in seconds",
+    ["book_id"]
+)
+
+cache_hit_counter = Counter(
+    "cache_hit_total",
+    "Total cache hits",
+    ["book_id"]
+)
+
+cache_miss_counter = Counter(
+    "cache_miss_total",
+    "Total cache misses",
+    ["book_id"]
+)
+
 # Router for metrics endpoint
 metrics_router = APIRouter()
 

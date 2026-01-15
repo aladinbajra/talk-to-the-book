@@ -78,13 +78,22 @@ async def upload_book(
         file_path = encrypted_path
     
     # Create book record
+    # Copyright heuristic (very conservative)
+    copyright_flag = "unknown"
+    try:
+        sample = content[:20000].decode("utf-8", errors="ignore").lower()
+        if "copyright" in sample or "all rights reserved" in sample:
+            copyright_flag = "clearly_copyrighted"
+    except Exception:
+        pass
+
     book = Book(
         book_id=book_id,
         title=file.filename,
         file_path=file_path,
         file_format=file_ext[1:],
         ingest_status="uploaded",
-        copyright_flag="unknown"
+        copyright_flag=copyright_flag
     )
     
     db.add(book)

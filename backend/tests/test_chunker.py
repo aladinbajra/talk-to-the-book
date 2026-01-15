@@ -21,6 +21,8 @@ def test_chunker_determinism():
         assert c1.chunk_id == c2.chunk_id
         assert c1.start_loc == c2.start_loc
         assert c1.end_loc == c2.end_loc
+        # Full sha256 hex digest
+        assert len(c1.chunk_id) == 64
 
 
 def test_chunker_respects_chapter_boundaries():

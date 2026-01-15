@@ -37,6 +37,9 @@ passlib[bcrypt]>=1.7.4
 prometheus-client>=0.19.0
 sentry-sdk[fastapi]>=1.38.0
 
+# Caching
+redis>=5.0.0
+
 # Storage
 boto3>=1.29.0  # S3-compatible
 cryptography>=41.0.0  # Encryption
@@ -45,6 +48,7 @@ cryptography>=41.0.0  # Encryption
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 httpx>=0.25.0
+requests>=2.31.0
 
 # Development
 black>=23.0.0

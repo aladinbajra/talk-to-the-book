@@ -1,0 +1,8 @@
+Sample Book
+
+Chapter 1: The Beginning
+This sample book is a tiny fixture used for automated tests. It explains that the system must answer only from provided text.
+
+Chapter 2: The Rule
+If a question asks for something not stated here, the system must respond with UNKNOWN IN BOOK.
+

@@ -58,7 +58,10 @@ class EmbeddingService:
         # Save index
         index_dir = Path(settings.FAISS_INDEX_PATH)
         index_dir.mkdir(parents=True, exist_ok=True)
-        
+
+        embeddings_dir = Path(settings.EMBEDDINGS_PATH)
+        embeddings_dir.mkdir(parents=True, exist_ok=True)
+
         index_path = index_dir / f"{book_id}.faiss"
         metadata_path = index_dir / f"{book_id}_metadata.json"
         
@@ -76,8 +79,8 @@ class EmbeddingService:
         with open(metadata_path, 'w') as f:
             json.dump(metadata, f, indent=2)
         
-        # Save embeddings
-        embeddings_path = index_dir / f"{book_id}_embeddings.npz"
+        # Save embeddings (separate path)
+        embeddings_path = embeddings_dir / f"{book_id}_embeddings.npz"
         np.savez_compressed(embeddings_path, embeddings=embeddings)
         
         print(f"✓ Saved index and embeddings for {book_id}")

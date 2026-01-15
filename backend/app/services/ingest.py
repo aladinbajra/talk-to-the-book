@@ -4,6 +4,7 @@ Ingest service for processing books.
 import json
 import os
 import asyncio
+import tempfile
 from pathlib import Path
 from typing import Dict, Any
 import numpy as np
@@ -53,9 +54,11 @@ class IngestService:
                 encryption_service = EncryptionService()
                 file_content = await encryption_service.decrypt_file(book.file_path)
             
-            # Save to temp file for processing
-            temp_file = Path(f"/tmp/{book_id}_temp.{book.file_format}")
-            temp_file.write_bytes(file_content)
+            # Save to temp file for processing (portable)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{book.file_format}") as tf:
+                tf.write(file_content)
+                temp_path = tf.name
+            temp_file = Path(temp_path)
             
             text = self.text_processor.extract_text(
                 str(temp_file),
@@ -64,7 +67,10 @@ class IngestService:
             text = self.text_processor.normalize_text(text)
             
             # Clean up temp file
-            temp_file.unlink()
+            try:
+                temp_file.unlink()
+            except Exception:
+                pass
             
             # Step 2: Detect chapters and chunk
             book.ingest_status = "chunking"

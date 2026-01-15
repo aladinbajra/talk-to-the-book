@@ -43,7 +43,8 @@ class Chunker:
     ) -> str:
         """Generate deterministic chunk ID."""
         data = f"{book_id}:{start_loc}:{end_loc}"
-        return hashlib.sha256(data.encode()).hexdigest()[:16]
+        # Full SHA256 hex digest for auditability/determinism
+        return hashlib.sha256(data.encode("utf-8")).hexdigest()
     
     def split_into_sentences(self, text: str) -> List[str]:
         """Split text into sentences."""
