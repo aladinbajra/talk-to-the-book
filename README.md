@@ -114,7 +114,3 @@ The ingest process produces a comprehensive JSON object containing:
 - Access to LLM API (for running the ingest prompt)
 - Vector database (FAISS, Qdrant, or Weaviate)
 - Embedding models (sentence-transformers or OpenAI)
-
-## License
-
-[Specify your license]
