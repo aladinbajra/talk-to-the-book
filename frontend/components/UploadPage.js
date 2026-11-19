@@ -1,143 +1,59 @@
-import { useState } from 'react'
-import axios from 'axios'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../services/api'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
-export default function UploadPage({ onUploadComplete }) {
+export default function UploadPage({ onUploadComplete, onBack }) {
   const [file, setFile] = useState(null)
-  const [uploading, setUploading] = useState(false)
-  const [userConsent, setUserConsent] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
-    if (selectedFile) {
-      const ext = selectedFile.name.split('.').pop().toLowerCase()
-      if (!['pdf', 'txt', 'epub'].includes(ext)) {
-        setError('Please upload a PDF, TXT, or ePub file')
-        return
-      }
-      setFile(selectedFile)
-      setError(null)
-    }
+  const [consent, setConsent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [bookId, setBookId] = useState(null)
+  const [stage, setStage] = useState('')
+  const [dragging, setDragging] = useState(false)
+  const input = useRef(null)
+  const request = useRef(null)
+  useEffect(() => () => request.current?.abort(), [])
+  const choose = selected => {
+    setError('')
+    if (!selected) return
+    if (!/\.(pdf|txt|epub)$/i.test(selected.name)) return setError('Please choose a PDF, TXT, or ePub file.')
+    if (!selected.size || selected.size > 100 * 1024 * 1024) return setError('Choose a non-empty file smaller than 100 MB.')
+    setFile(selected)
+    setBookId(null)
   }
-
-  const handleUpload = async () => {
-    if (!file) {
-      setError('Please select a file')
-      return
-    }
-
-    if (!userConsent) {
-      setError('Please confirm you have the right to upload this book')
-      return
-    }
-
-    setUploading(true)
-    setError(null)
-    setSuccess(null)
-
+  const submit = async event => {
+    event.preventDefault()
+    if ((!file && !bookId) || !consent || busy) return
+    const controller = new AbortController()
+    request.current = controller
+    setBusy(true)
+    setError('')
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('user_consent', userConsent)
-
-      const response = await axios.post(`${API_URL}/api/v1/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      setSuccess(`Book uploaded successfully! Book ID: ${response.data.book_id}`)
-      
-      // Start ingest automatically
-      await axios.post(`${API_URL}/api/v1/ingest/start`, {
-        book_id: response.data.book_id,
-      })
-
-      setTimeout(() => {
-        onUploadComplete(response.data.book_id)
-      }, 2000)
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Upload failed. Please try again.'
-      )
-    } finally {
-      setUploading(false)
-    }
+      let id = bookId
+      if (!id) {
+        setStage('Uploading your book…')
+        const form = new FormData()
+        form.append('file', file)
+        form.append('user_consent', String(consent))
+        id = (await api('/upload', { method: 'POST', body: form, signal: controller.signal })).book_id
+        setBookId(id)
+      }
+      setStage('Starting book processing…')
+      await api('/ingest/start', { method: 'POST', body: JSON.stringify({ book_id: id }), signal: controller.signal })
+      onUploadComplete(id)
+    } catch (failure) { if (!controller.signal.aborted) setError(failure.message || 'Please try again.') }
+    finally { if (!controller.signal.aborted) setBusy(false) }
   }
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Upload a Book</h2>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select File (PDF, TXT, or ePub)
-          </label>
-          <input
-            type="file"
-            accept=".pdf,.txt,.epub"
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            disabled={uploading}
-          />
-          {file && (
-            <p className="mt-2 text-sm text-gray-600">
-              Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-            </p>
-          )}
-        </div>
-
-        <div className="mb-6">
-          <label className="flex items-start">
-            <input
-              type="checkbox"
-              checked={userConsent}
-              onChange={(e) => setUserConsent(e.target.checked)}
-              className="mt-1 mr-2"
-              disabled={uploading}
-            />
-            <span className="text-sm text-gray-700">
-              I confirm I have the right to upload this book for personal Q&A
-              purposes and understand that embeddings will be stored for 180 days
-              unless I delete the book.
-            </span>
-          </label>
-        </div>
-
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-800 text-sm">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
-            <p className="text-green-800 text-sm">{success}</p>
-          </div>
-        )}
-
-        <button
-          onClick={handleUpload}
-          disabled={uploading || !file || !userConsent}
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {uploading ? 'Uploading...' : 'Upload and Process'}
-        </button>
+  return <div className="upload-page"><button className="text-button back-button" onClick={onBack}>← Back to your library</button><div className="eyebrow">MAKE ROOM FOR SOMETHING GOOD</div><h1>A new book.<br /><em>A new conversation.</em></h1><p className="page-description">Bring a book you love. We’ll help you explore it, one question at a time.</p>
+    <form onSubmit={submit} className="upload-panel">
+      <div className={`drop-zone ${dragging ? 'dragging' : ''}`} onDragOver={event => { event.preventDefault(); if (!busy) setDragging(true) }} onDragLeave={() => setDragging(false)} onDrop={event => { event.preventDefault(); setDragging(false); if (!busy) choose(event.dataTransfer.files[0]) }}>
+        <span className="upload-symbol" aria-hidden="true">↑</span><h2>{file ? file.name : 'Drop your book right here'}</h2><p>{file ? `${(file.size / 1024 / 1024).toFixed(2)} MB · Ready to upload` : 'or choose a file from your computer'}</p><button type="button" className="button secondary" disabled={busy} onClick={() => input.current?.click()}>{file ? 'Choose another file' : 'Browse files'}</button><input ref={input} className="sr-only" type="file" aria-label="Choose a book file" accept=".pdf,.txt,.epub" disabled={busy} onChange={event => choose(event.target.files[0])} /><small>PDF, TXT or ePub · Up to 100 MB</small>
       </div>
-
-      <div className="mt-6 text-sm text-gray-600">
-        <p className="mb-2">
-          <strong>Note:</strong> The book will be processed automatically after
-          upload. This may take several minutes depending on the book size.
-        </p>
-        <p>
-          Supported formats: PDF, TXT, ePub (max 100MB)
-        </p>
-      </div>
-    </div>
-  )
+      <label className="consent-check"><input type="checkbox" checked={consent} disabled={busy} onChange={event => setConsent(event.target.checked)} /><span>I have the right to upload this book and agree to have it processed for personal questions and answers.</span></label>
+      {error && <div className="notice error" role="alert"><p>{error}</p>{bookId && <small>Your book is saved. Retry processing without uploading it again.</small>}</div>}
+      {busy && <p className="upload-progress" role="status"><span className="spinner" />{stage}</p>}
+      <button className="button primary full-width" type="submit" disabled={busy || !file || !consent}>{busy ? 'Please wait…' : bookId ? 'Retry processing ↗' : 'Add to my library ↗'}</button>
+      <p className="upload-privacy">Processing may take a few minutes. Follow the progress in your library.</p>
+    </form>
+    <div className="upload-steps"><div><b>01</b><span>Add your book</span></div><div><b>02</b><span>We organize its passages</span></div><div><b>03</b><span>Follow your curiosity</span></div></div>
+  </div>
 }

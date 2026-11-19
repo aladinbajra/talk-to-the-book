@@ -1,29 +1,32 @@
 """
 FastAPI main application for Talk to the Book.
 """
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+
 import time
 from contextlib import asynccontextmanager
 
-from app.api import upload, ingest, query, books, feedback, delete
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from app.api import books, delete, feedback, ingest, query, upload
 from app.core.config import settings
+from app.core.logging import setup_logging
 from app.core.metrics import metrics_router
 from app.db.database import init_db
-from app.core.logging import setup_logging
 
 # Setup logging
 setup_logging()
 
 # Metrics
-from prometheus_client import Counter, Histogram, Gauge
+from prometheus_client import Counter, Gauge, Histogram
+
 from app.core.metrics import (
+    average_confidence_gauge,
+    feedback_positive_rate_gauge,
     query_count_total,
     query_latency_seconds,
     unknown_rate_counter,
-    average_confidence_gauge,
-    feedback_positive_rate_gauge,
 )
 
 
@@ -104,4 +107,5 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

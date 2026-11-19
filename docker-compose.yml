@@ -6,11 +6,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=sqlite:///./talk_to_the_book.db
+      - DATABASE_URL=sqlite:////app/storage/talk_to_the_book.db
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - STORAGE_PATH=./storage
       - FAISS_INDEX_PATH=./storage/indices
-      - DEBUG=true
+      - DEBUG=false
     volumes:
       - ./storage:/app/storage
       - ./master_ingest_prompt.txt:/app/master_ingest_prompt.txt

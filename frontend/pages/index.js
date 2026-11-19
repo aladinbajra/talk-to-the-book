@@ -5,85 +5,31 @@ import ChatPage from '../components/ChatPage'
 import UploadPage from '../components/UploadPage'
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState('books') // 'books', 'chat', 'upload'
-  const [selectedBookId, setSelectedBookId] = useState(null)
-
-  return (
-    <>
-      <Head>
-        <title>Talk to the Book</title>
-        <meta name="description" content="Interactive Q&A for your books" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex">
-                <div className="flex-shrink-0 flex items-center">
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Talk to the Book
-                  </h1>
-                </div>
-                <div className="ml-10 flex items-center space-x-4">
-                  <button
-                    onClick={() => setCurrentView('books')}
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                      currentView === 'books'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Books
-                  </button>
-                  <button
-                    onClick={() => setCurrentView('upload')}
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                      currentView === 'upload'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Upload
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+  const [view, setView] = useState('books')
+  const [book, setBook] = useState(null)
+  return <>
+    <Head><title>Talk to the Book — Your reading companion</title><meta name="description" content="A quiet place to read between the lines. Ask your books questions and explore the passages behind every answer." /><meta name="viewport" content="width=device-width, initial-scale=1" /></Head>
+    <a className="skip-link" href="#workspace">Skip to content</a>
+    <div className="app-shell">
+      <aside className="sidebar">
+        <a href="#" onClick={event => { event.preventDefault(); setView('books') }} className="brand"><span className="brand-mark" aria-hidden="true">b.</span><span>Talk to<br /><strong>the Book</strong></span></a>
+        <div className="sidebar-label">YOUR SPACE</div>
+        <nav aria-label="Main navigation">
+          <button className={`nav-item ${view === 'books' ? 'active' : ''}`} aria-current={view === 'books' ? 'page' : undefined} onClick={() => setView('books')}><span aria-hidden="true">▤</span> My library <span className="nav-arrow">↗</span></button>
+          <button className={`nav-item ${view === 'upload' ? 'active' : ''}`} aria-current={view === 'upload' ? 'page' : undefined} onClick={() => setView('upload')}><span aria-hidden="true">＋</span> Add a book</button>
         </nav>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {currentView === 'books' && (
-            <BooksList
-              onSelectBook={(bookId) => {
-                setSelectedBookId(bookId)
-                setCurrentView('chat')
-              }}
-            />
-          )}
-
-          {currentView === 'chat' && selectedBookId && (
-            <ChatPage
-              bookId={selectedBookId}
-              onBack={() => {
-                setSelectedBookId(null)
-                setCurrentView('books')
-              }}
-            />
-          )}
-
-          {currentView === 'upload' && (
-            <UploadPage
-              onUploadComplete={(bookId) => {
-                setSelectedBookId(bookId)
-                setCurrentView('books')
-              }}
-            />
-          )}
-        </div>
-      </main>
-    </>
-  )
+        <div className="sidebar-note"><span className="tiny-book" aria-hidden="true">❧</span><p>Good books have<br /><em>more to say.</em></p><small>Keep the conversation going.</small></div>
+        <div className="sidebar-bottom"><span className="status-dot" /> Your personal reading space</div>
+      </aside>
+      <div className="main-column">
+        <header className="topbar"><span>YOUR READING COMPANION</span><span className="topbar-note">Read. Question. Discover.</span></header>
+        <main id="workspace" className={`workspace ${view === 'chat' ? 'chat-workspace' : ''}`}>
+          {view === 'books' && <BooksList onSelectBook={selected => { setBook(selected); setView('chat') }} onUpload={() => setView('upload')} />}
+          {view === 'upload' && <UploadPage onUploadComplete={() => setView('books')} onBack={() => setView('books')} />}
+          {view === 'chat' && book && <ChatPage key={book.book_id} bookId={book.book_id} title={book.title} onBack={() => setView('books')} />}
+        </main>
+        <footer className="page-footer"><span>A little curiosity goes a long way.</span><span>Talk to the Book <span aria-hidden="true">↗</span></span></footer>
+      </div>
+    </div>
+  </>
 }

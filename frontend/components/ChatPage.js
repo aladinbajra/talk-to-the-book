@@ -1,161 +1,55 @@
-import { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../services/api'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+function conversationTurns(messages) {
+  const turns = []
+  for (const message of messages) {
+    if (message.role === 'user') turns.push({ user: message.content, assistant: '' })
+    else if (turns.length) turns[turns.length - 1].assistant = message.content
+  }
+  return turns.filter(turn => turn.assistant).slice(-5)
+}
 
-export default function ChatPage({ bookId, onBack }) {
+export default function ChatPage({ bookId, title, onBack }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const messagesEndRef = useRef(null)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!input.trim() || loading) return
-
-    const userMessage = input.trim()
+  const [error, setError] = useState('')
+  const [lastQuestion, setLastQuestion] = useState('')
+  const end = useRef(null)
+  const request = useRef(null)
+  const composer = useRef(null)
+  useEffect(() => { end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [messages, loading])
+  useEffect(() => () => request.current?.abort(), [])
+  const send = async (question, retry = false) => {
+    question = question.trim()
+    if (!question || question.length > 4000 || loading) return
+    if (!retry) setMessages(previous => [...previous, { role: 'user', content: question }])
+    setLastQuestion(question)
     setInput('')
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
-
+    setError('')
+    const controller = new AbortController()
+    request.current = controller
     try {
-      const history = messages
-        .filter((m) => m.role !== 'system')
-        .map((m) => ({
-          user: m.role === 'user' ? m.content : '',
-          assistant: m.role === 'assistant' ? m.content : '',
-        }))
-        .filter((m) => m.user || m.assistant)
-
-      const response = await axios.post(`${API_URL}/api/v1/query`, {
-        book_id: bookId,
-        question: userMessage,
-        history: history,
-      })
-
-      const answer = response.data.answer
-      const confidence = response.data.confidence
-      const sources = response.data.sources || []
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: answer,
-          confidence,
-          sources,
-          explanation: response.data.explanation,
-        },
-      ])
-    } catch (error) {
-      console.error('Query error:', error)
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: 'Sorry, I encountered an error processing your question.',
-          error: true,
-        },
-      ])
-    } finally {
-      setLoading(false)
-    }
+      const answer = await api('/query', { method: 'POST', body: JSON.stringify({ book_id: bookId, question, history: conversationTurns(messages) }), signal: controller.signal })
+      if (!controller.signal.aborted) setMessages(previous => [...previous, { role: 'assistant', content: answer.answer, ...answer }])
+    } catch (failure) { if (!controller.signal.aborted) setError(failure.message) }
+    finally { if (!controller.signal.aborted) { setLoading(false); composer.current?.focus() } }
   }
-
-  return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      <div className="flex items-center mb-4">
-        <button
-          onClick={onBack}
-          className="mr-4 text-blue-600 hover:text-blue-800"
-        >
-          ← Back
-        </button>
-        <h2 className="text-2xl font-bold">Chat</h2>
-      </div>
-
-      <div className="flex-1 overflow-y-auto bg-white rounded-lg shadow p-6 mb-4">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-12">
-            <p>Ask a question about the book to get started.</p>
-          </div>
-        )}
-
-        {messages.map((message, idx) => (
-          <div
-            key={idx}
-            className={`mb-4 ${
-              message.role === 'user' ? 'text-right' : 'text-left'
-            }`}
-          >
-            <div
-              className={`inline-block max-w-3xl rounded-lg p-4 ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : message.error
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <p className="whitespace-pre-wrap">{message.content}</p>
-              {message.confidence !== undefined && (
-                <p className="text-xs mt-2 opacity-75">
-                  Confidence: {(message.confidence * 100).toFixed(0)}%
-                  {message.sources && message.sources.length > 0 && (
-                    <span className="ml-2">
-                      ({message.sources.length} sources)
-                    </span>
-                  )}
-                </p>
-              )}
-              {message.explanation && (
-                <p className="text-xs mt-1 opacity-75 italic">
-                  {message.explanation}
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {loading && (
-          <div className="text-left mb-4">
-            <div className="inline-block bg-gray-100 rounded-lg p-4">
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                <span className="text-gray-600">Thinking...</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex space-x-4">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question about the book..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          disabled={loading || !input.trim()}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Send
-        </button>
-      </form>
+  const starters = ['What are the main ideas in this book?', 'Summarize the opening chapter.', 'Which passages explain the central theme?']
+  return <div className="chat-layout">
+    <div className="chat-header"><button className="text-button" onClick={onBack}>← Library</button><div><span className="eyebrow">IN CONVERSATION WITH</span><h1>{title || 'Your book'}</h1></div><span className="source-badge"><span className="status-dot" /> Answers with sources</span></div>
+    <div className="chat-messages" role="log" aria-label="Conversation" aria-live="polite">
+      {messages.length === 0 && <div className="chat-welcome"><div className="chat-flower" aria-hidden="true">✳</div><h2>There’s more<br /><em>between the lines.</em></h2><p>Ask a question. Follow an idea. Find the passage that makes it click.</p><div className="starter-questions">{starters.map(question => <button key={question} disabled={loading} onClick={() => void send(question)}>{question}<span aria-hidden="true">↗</span></button>)}</div></div>}
+      {messages.map((message, index) => <article className={`message ${message.role}`} key={index}><div className="message-label">{message.role === 'user' ? 'YOU' : 'YOUR READING COMPANION'}</div><p className="message-body">{message.content === 'UNKNOWN IN BOOK' ? 'I couldn’t find support for an answer in this book. Try asking about a specific chapter or idea.' : message.content}</p>
+        {message.role === 'assistant' && message.source_details?.length > 0 && <div className="source-passages"><div className="source-heading">READ THE PASSAGES BEHIND THIS ANSWER <span>{message.source_details.length}</span></div>{message.source_details.map((source, position) => <details key={source.chunk_id}><summary><span className="citation-number">{position + 1}</span>{source.chapter ? `Chapter ${source.chapter}` : 'Book passage'} <span className="source-location">{source.start_loc?.replace('word_', 'Word ')}</span><span aria-hidden="true">＋</span></summary><blockquote>{source.excerpt}</blockquote></details>)}</div>}
+        {message.role === 'assistant' && message.sources?.length > 0 && !message.source_details?.length && <p className="citation-fallback">Sources: {message.sources.join(', ')}</p>}
+      </article>)}
+      {loading && <div className="thinking" role="status"><span className="spinner" />Looking through the book…</div>}
+      {error && <div className="notice error" role="alert" aria-label="Question failed"><p>{error}</p><button className="text-button" onClick={() => void send(lastQuestion, true)}>Retry this question ↗</button></div>}
+      <div ref={end} />
     </div>
-  )
+    <form className="chat-composer" onSubmit={event => { event.preventDefault(); void send(input) }}><label className="sr-only" htmlFor="question">Ask a question about this book</label><textarea id="question" ref={composer} value={input} maxLength={4000} rows={2} onChange={event => setInput(event.target.value)} placeholder="What would you like to discover?" disabled={loading} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(input) } }} /><button type="submit" className="send-button" aria-label="Send question" disabled={loading || !input.trim()}>↑</button><div className="composer-footer"><span>Answers draw from your book. Open a source passage to explore further.</span><span>{input.length}/4000</span></div></form>
+  </div>
 }

@@ -1,16 +1,16 @@
 """
 Database configuration and session management.
 """
+
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 from app.core.config import settings
 
 # Create engine
 if settings.DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False}
+        settings.DATABASE_URL, connect_args={"check_same_thread": False}
     )
 else:
     engine = create_engine(settings.DATABASE_URL)
@@ -23,6 +23,7 @@ Base = declarative_base()
 async def init_db():
     """Initialize database tables."""
     from app.db import models
+
     Base.metadata.create_all(bind=engine)
 
 

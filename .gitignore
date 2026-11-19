@@ -57,3 +57,15 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+node_modules/
+.next/
+out/
+storage/
+*.db
+*.db-shm
+*.db-wal
+.pytest_cache/
+test-results/
+playwright-report/
+.env.*
+!.env.example
